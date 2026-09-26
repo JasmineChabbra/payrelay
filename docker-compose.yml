@@ -1,0 +1,67 @@
+# PayRelay: one command starts the whole stack.
+#   docker compose up --build
+# Console: http://localhost:3000
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: payrelay
+      POSTGRES_USER: payrelay
+      POSTGRES_PASSWORD: payrelay
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U payrelay -d payrelay"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  bank-simulator:
+    build: ./bank-simulator
+    environment:
+      SIMULATOR_API_KEY: sim-secret-key
+    ports:
+      - "8081:8081"
+
+  payrelay-api:
+    build: ./payrelay-api
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/payrelay
+      DB_USER: payrelay
+      DB_PASSWORD: payrelay
+      REDIS_HOST: redis
+      SIMULATOR_URL: http://bank-simulator:8081
+      SIMULATOR_API_KEY: sim-secret-key
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      bank-simulator:
+        condition: service_started
+
+  payrelay-ui:
+    build: ./payrelay-ui
+    ports:
+      - "3000:80"
+    depends_on:
+      - payrelay-api
+      - bank-simulator
+
+volumes:
+  pgdata:

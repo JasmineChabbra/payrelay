@@ -1,0 +1,55 @@
+@import "tailwindcss";
+
+/*
+ * PayRelay console palette. Cool, low-glare neutrals for long shifts; colour is reserved for
+ * payment state so status is the first thing the eye finds.
+ */
+@theme {
+  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
+
+  --color-canvas: #eef1f5;
+  --color-panel: #ffffff;
+  --color-line: #d8dee7;
+  --color-ink: #17212e;
+  --color-muted: #5b6878;
+  --color-brand: #233a8f;
+  --color-brand-soft: #e3e8f8;
+
+  --color-ok: #17775f;
+  --color-ok-soft: #dff2eb;
+  --color-wait: #9a5b08;
+  --color-wait-soft: #fbeed5;
+  --color-bad: #b3322a;
+  --color-bad-soft: #f9e1df;
+  --color-dead: #6b3fa8;
+  --color-dead-soft: #ece3f7;
+  --color-run: #2560c4;
+  --color-run-soft: #e0eafa;
+}
+
+@layer base {
+  html {
+    background: var(--color-canvas);
+    color: var(--color-ink);
+    font-feature-settings: "tnum" 1; /* tabular figures: amounts and counts line up */
+  }
+  body {
+    @apply font-sans antialiased;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-brand);
+    outline-offset: 2px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+/* Range sliders in the chaos lab */
+input[type="range"] {
+  accent-color: var(--color-brand);
+}

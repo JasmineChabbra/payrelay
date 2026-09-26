@@ -1,0 +1,61 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: payrelay-api
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/payrelay}
+    username: ${DB_USER:payrelay}
+    password: ${DB_PASSWORD:payrelay}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  flyway:
+    enabled: true
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      timeout: 2s
+
+payrelay:
+  simulator:
+    base-url: ${SIMULATOR_URL:http://localhost:8081}
+    api-key: ${SIMULATOR_API_KEY:sim-secret-key}
+    connect-timeout: 2s
+    read-timeout: 3s
+  idempotency:
+    store: redis          # redis | memory
+    lock-ttl: 30s
+  retry:
+    max-attempts-per-step: 5
+    base-delay: 1s
+    max-delay: 60s
+  # Bank credentials, referenced by name (secretRef) from bank configs. Never stored in the database.
+  # Defaults match the bank simulator; override with environment variables in any real deployment.
+  secrets:
+    nova-api-key: ${NOVA_API_KEY:nova-demo-key}
+    zenith-client-secret: ${ZENITH_CLIENT_SECRET:zenith-demo-secret}
+    orbit-hmac-secret: ${ORBIT_HMAC_SECRET:orbit-demo-hmac-secret}
+    kestrel-api-key: ${KESTREL_API_KEY:kestrel-demo-key}
+  worker:
+    poll-interval-ms: 1000
+    batch-size: 50
+    lease: 60s
+    threads: 16
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+
+logging:
+  pattern:
+    level: "%5p [cid=%X{correlationId:-none}]"

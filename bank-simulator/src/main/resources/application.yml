@@ -1,0 +1,25 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: bank-simulator
+
+simulator:
+  api-key: ${SIMULATOR_API_KEY:sim-secret-key}
+  banks: NOVA,ZENITH,ORBIT,KESTREL
+  # Each bank's credentials. PayRelay holds the same values as payrelay.secrets.*
+  bank-secrets:
+    nova-api-key: ${NOVA_API_KEY:nova-demo-key}
+    zenith-client-id: payrelay
+    zenith-client-secret: ${ZENITH_CLIENT_SECRET:zenith-demo-secret}
+    zenith-token-ttl-seconds: 300
+    orbit-key-id: payrelay-01
+    orbit-hmac-secret: ${ORBIT_HMAC_SECRET:orbit-demo-hmac-secret}
+    kestrel-api-key: ${KESTREL_API_KEY:kestrel-demo-key}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
